@@ -1,0 +1,10 @@
+[project]
+name = "exit-ready"
+version = "1.0.0"
+description = "Cloud exit strategy and portability assessment framework"
+requires-python = ">=3.10"
+dependencies = []
+[project.scripts]
+exitkit = "exitkit.cli:main"
+[tool.setuptools.package-data]
+exitkit = ["data/*.json"]

@@ -1,0 +1,434 @@
+{
+ "aws_vpc": {
+  "provider": "aws",
+  "category": "network",
+  "class": 2,
+  "effort": 0.6,
+  "target": "Any VPC/VNet via Terraform module",
+  "playbook": "Recreate CIDR plan; site-to-site VPN/interconnect first, then peer with legacy."
+ },
+ "aws_subnet": {
+  "provider": "aws",
+  "category": "network",
+  "class": 1,
+  "effort": 0.1,
+  "target": "Any provider subnet",
+  "playbook": "Codify in IaC; no data."
+ },
+ "aws_security_group": {
+  "provider": "aws",
+  "category": "network",
+  "class": 2,
+  "effort": 0.2,
+  "target": "Cloud firewall / Cilium network policy",
+  "playbook": "Export rules to neutral policy format; test deny-by-default."
+ },
+ "aws_lb": {
+  "provider": "aws",
+  "category": "network",
+  "class": 3,
+  "effort": 0.8,
+  "target": "Envoy / HAProxy / nginx ingress",
+  "playbook": "Replicate listeners and health checks; weighted DNS cutover."
+ },
+ "aws_iam_role": {
+  "provider": "aws",
+  "category": "identity",
+  "class": 4,
+  "effort": 1.0,
+  "target": "OIDC/SAML federation + OPA policies (Keycloak/Vault)",
+  "playbook": "Inventory trust policies; map to neutral RBAC; replace instance-profile auth with workload identity."
+ },
+ "aws_iam_policy": {
+  "provider": "aws",
+  "category": "identity",
+  "class": 4,
+  "effort": 0.3,
+  "target": "OPA / Kubernetes RBAC",
+  "playbook": "Translate JSON policies to target authz model; test with access-analyzer diffs."
+ },
+ "aws_cognito_user_pool": {
+  "provider": "aws",
+  "category": "identity",
+  "class": 5,
+  "effort": 1.2,
+  "target": "Keycloak / Ory / authentik",
+  "playbook": "Password hashes cannot be exported: use lazy-migration on first login or forced reset; plan comms."
+ },
+ "aws_kms_key": {
+  "provider": "aws",
+  "category": "keys",
+  "class": 4,
+  "effort": 1.0,
+  "target": "Vault/HSM-backed KMS with BYOK/HYOK",
+  "playbook": "Keys are non-exportable: re-encrypt every dataset under new keys; schedule rewrite windows."
+ },
+ "aws_secretsmanager_secret": {
+  "provider": "aws",
+  "category": "keys",
+  "class": 3,
+  "effort": 0.3,
+  "target": "HashiCorp Vault / External Secrets Operator",
+  "playbook": "Export, rotate on arrival, update consumers."
+ },
+ "aws_instance": {
+  "provider": "aws",
+  "category": "vm",
+  "class": 1,
+  "effort": 0.5,
+  "target": "Any IaaS VM or bare metal",
+  "playbook": "Image export (OVA/QCOW2) or rebuild from IaC; cutover by DNS."
+ },
+ "aws_eks_cluster": {
+  "provider": "aws",
+  "category": "containers",
+  "class": 2,
+  "effort": 1.0,
+  "target": "Upstream Kubernetes (any provider/on-prem)",
+  "playbook": "Replace IRSA/ALB-controller add-ons; GitOps re-point; run clusters in parallel."
+ },
+ "aws_ecs_service": {
+  "provider": "aws",
+  "category": "containers",
+  "class": 3,
+  "effort": 1.0,
+  "target": "Kubernetes",
+  "playbook": "Translate task definitions to Deployments; swap service discovery."
+ },
+ "aws_lambda_function": {
+  "provider": "aws",
+  "category": "serverless",
+  "class": 4,
+  "effort": 1.0,
+  "target": "Knative / OpenFaaS / containerised services",
+  "playbook": "Repackage handlers as containers; re-implement event-source mappings."
+ },
+ "aws_api_gateway_rest_api": {
+  "provider": "aws",
+  "category": "serverless",
+  "class": 4,
+  "effort": 1.0,
+  "target": "Kong / Envoy Gateway",
+  "playbook": "Export OpenAPI; re-create authorizers, throttling, usage plans."
+ },
+ "aws_sfn_state_machine": {
+  "provider": "aws",
+  "category": "serverless",
+  "class": 5,
+  "effort": 1.5,
+  "target": "Temporal / Argo Workflows / Camunda",
+  "playbook": "ASL has no standard equivalent: re-model workflows and re-test failure paths."
+ },
+ "aws_db_instance": {
+  "provider": "aws",
+  "category": "relational",
+  "class": 2,
+  "effort": 1.0,
+  "target": "Self-managed or other-cloud Postgres/MySQL",
+  "playbook": "Logical replication to target; verify row counts and checksums; promote."
+ },
+ "aws_rds_cluster": {
+  "provider": "aws",
+  "category": "relational",
+  "class": 3,
+  "effort": 1.2,
+  "target": "Postgres/MySQL community edition",
+  "playbook": "Aurora-specific features (fast clone, global DB) must be re-designed; use logical replication."
+ },
+ "aws_dynamodb_table": {
+  "provider": "aws",
+  "category": "nosql",
+  "class": 5,
+  "effort": 1.5,
+  "target": "ScyllaDB / Cassandra / PostgreSQL JSONB",
+  "playbook": "Access patterns are the schema: re-model, dual-write via streams, backfill, verify, cut reads then writes."
+ },
+ "aws_redshift_cluster": {
+  "provider": "aws",
+  "category": "warehouse",
+  "class": 4,
+  "effort": 1.3,
+  "target": "ClickHouse / Trino + Iceberg on object storage",
+  "playbook": "UNLOAD to Parquet, re-create distribution/sort keys, port stored procedures."
+ },
+ "aws_s3_bucket": {
+  "provider": "aws",
+  "category": "object",
+  "class": 2,
+  "effort": 0.8,
+  "target": "MinIO / Ceph / any S3-compatible store",
+  "playbook": "rclone/sync with checksums; replicate bucket policies and lifecycle rules; egress is the cost driver."
+ },
+ "aws_elasticache_cluster": {
+  "provider": "aws",
+  "category": "cache",
+  "class": 2,
+  "effort": 0.5,
+  "target": "Redis OSS / Valkey",
+  "playbook": "Warm cache or replica-sync; cache is rebuildable."
+ },
+ "aws_sqs_queue": {
+  "provider": "aws",
+  "category": "messaging",
+  "class": 4,
+  "effort": 0.8,
+  "target": "RabbitMQ / NATS / Kafka",
+  "playbook": "Dual-publish, drain legacy queue, flip consumers; handle DLQs and visibility timeouts."
+ },
+ "aws_sns_topic": {
+  "provider": "aws",
+  "category": "messaging",
+  "class": 4,
+  "effort": 0.6,
+  "target": "Kafka topics / NATS subjects",
+  "playbook": "Re-create fan-out subscriptions; retest filtering policies."
+ },
+ "aws_kinesis_stream": {
+  "provider": "aws",
+  "category": "streaming",
+  "class": 5,
+  "effort": 1.3,
+  "target": "Kafka / Redpanda",
+  "playbook": "Mirror with a bridge consumer; rebase offsets; replay window planning."
+ },
+ "aws_msk_cluster": {
+  "provider": "aws",
+  "category": "streaming",
+  "class": 2,
+  "effort": 0.9,
+  "target": "Apache Kafka anywhere",
+  "playbook": "MirrorMaker 2 replication; move consumer groups."
+ },
+ "aws_sagemaker_endpoint": {
+  "provider": "aws",
+  "category": "ml",
+  "class": 5,
+  "effort": 1.5,
+  "target": "KServe / MLflow + Triton on Kubernetes",
+  "playbook": "Export model artifacts; rebuild serving image and autoscaling; re-validate drift and latency."
+ },
+ "aws_glue_job": {
+  "provider": "aws",
+  "category": "analytics",
+  "class": 5,
+  "effort": 1.2,
+  "target": "Apache Spark on Kubernetes / Airflow",
+  "playbook": "Rewrite DynamicFrame code to open Spark; replace Data Catalog with Hive/Iceberg catalog."
+ },
+ "aws_cloudfront_distribution": {
+  "provider": "aws",
+  "category": "edge",
+  "class": 3,
+  "effort": 0.7,
+  "target": "Any CDN (Fastly/Cloudflare/Varnish)",
+  "playbook": "Re-create behaviours and cache keys; lower TTLs then switch CNAME."
+ },
+ "aws_route53_zone": {
+  "provider": "aws",
+  "category": "edge",
+  "class": 2,
+  "effort": 0.4,
+  "target": "Any authoritative DNS",
+  "playbook": "Zone export; pre-lower TTLs; delegate NS at registrar."
+ },
+ "aws_cloudwatch_log_group": {
+  "provider": "aws",
+  "category": "observability",
+  "class": 3,
+  "effort": 0.5,
+  "target": "OpenTelemetry + Loki/Elastic",
+  "playbook": "Dual-ship logs; port metric filters and alarms."
+ },
+ "aws_cloudwatch_metric_alarm": {
+  "provider": "aws",
+  "category": "observability",
+  "class": 3,
+  "effort": 0.2,
+  "target": "Prometheus Alertmanager",
+  "playbook": "Rewrite alert rules in PromQL."
+ },
+ "azurerm_linux_virtual_machine": {
+  "provider": "azure",
+  "category": "vm",
+  "class": 1,
+  "effort": 0.5,
+  "target": "Any IaaS VM",
+  "playbook": "Export VHD or rebuild from IaC."
+ },
+ "azurerm_kubernetes_cluster": {
+  "provider": "azure",
+  "category": "containers",
+  "class": 2,
+  "effort": 1.0,
+  "target": "Upstream Kubernetes",
+  "playbook": "Replace AAD pod identity/ingress add-ons; GitOps re-point."
+ },
+ "azurerm_postgresql_flexible_server": {
+  "provider": "azure",
+  "category": "relational",
+  "class": 2,
+  "effort": 1.0,
+  "target": "Postgres anywhere",
+  "playbook": "Logical replication, checksum, promote."
+ },
+ "azurerm_cosmosdb_account": {
+  "provider": "azure",
+  "category": "nosql",
+  "class": 5,
+  "effort": 1.5,
+  "target": "MongoDB/Cassandra/PostgreSQL",
+  "playbook": "Native SQL API is proprietary; re-model, change-feed dual-write, backfill."
+ },
+ "azurerm_storage_account": {
+  "provider": "azure",
+  "category": "object",
+  "class": 3,
+  "effort": 0.9,
+  "target": "MinIO/Ceph (S3 API)",
+  "playbook": "Blob API differs from S3: adapt SDK calls; AzCopy/rclone with checksums."
+ },
+ "azurerm_servicebus_namespace": {
+  "provider": "azure",
+  "category": "messaging",
+  "class": 4,
+  "effort": 0.9,
+  "target": "RabbitMQ (AMQP) / Kafka",
+  "playbook": "Dual-publish; migrate subscriptions and sessions."
+ },
+ "azurerm_eventhub_namespace": {
+  "provider": "azure",
+  "category": "streaming",
+  "class": 3,
+  "effort": 0.9,
+  "target": "Kafka (Event Hubs has Kafka endpoint)",
+  "playbook": "Repoint producers; MirrorMaker."
+ },
+ "azurerm_linux_function_app": {
+  "provider": "azure",
+  "category": "serverless",
+  "class": 4,
+  "effort": 1.0,
+  "target": "Knative/OpenFaaS",
+  "playbook": "Containerise functions; port bindings and triggers."
+ },
+ "azurerm_key_vault": {
+  "provider": "azure",
+  "category": "keys",
+  "class": 4,
+  "effort": 1.0,
+  "target": "HashiCorp Vault / HSM",
+  "playbook": "Keys non-exportable if HSM-backed: re-encrypt data."
+ },
+ "azuread_application": {
+  "provider": "azure",
+  "category": "identity",
+  "class": 4,
+  "effort": 1.0,
+  "target": "Keycloak / OIDC provider",
+  "playbook": "Recreate app registrations, claims mapping, conditional-access equivalents."
+ },
+ "azurerm_synapse_workspace": {
+  "provider": "azure",
+  "category": "warehouse",
+  "class": 5,
+  "effort": 1.5,
+  "target": "ClickHouse/Trino/Spark",
+  "playbook": "Export to Parquet; rewrite pipelines and T-SQL specifics."
+ },
+ "azurerm_cognitive_account": {
+  "provider": "azure",
+  "category": "ml",
+  "class": 5,
+  "effort": 1.4,
+  "target": "Self-hosted open models + KServe",
+  "playbook": "Re-evaluate quality on open models; rebuild prompts and guardrails."
+ },
+ "google_compute_instance": {
+  "provider": "gcp",
+  "category": "vm",
+  "class": 1,
+  "effort": 0.5,
+  "target": "Any IaaS VM",
+  "playbook": "Image export or IaC rebuild."
+ },
+ "google_container_cluster": {
+  "provider": "gcp",
+  "category": "containers",
+  "class": 2,
+  "effort": 1.0,
+  "target": "Upstream Kubernetes",
+  "playbook": "Replace Workload Identity/GCLB add-ons; GitOps re-point."
+ },
+ "google_cloud_run_service": {
+  "provider": "gcp",
+  "category": "containers",
+  "class": 2,
+  "effort": 0.7,
+  "target": "Knative on Kubernetes",
+  "playbook": "Cloud Run is Knative-compatible: redeploy manifests."
+ },
+ "google_sql_database_instance": {
+  "provider": "gcp",
+  "category": "relational",
+  "class": 2,
+  "effort": 1.0,
+  "target": "Postgres/MySQL anywhere",
+  "playbook": "Logical replication, checksum, promote."
+ },
+ "google_spanner_instance": {
+  "provider": "gcp",
+  "category": "nosql",
+  "class": 5,
+  "effort": 1.6,
+  "target": "CockroachDB / YugabyteDB",
+  "playbook": "TrueTime semantics differ; re-test transactions and latency."
+ },
+ "google_bigtable_instance": {
+  "provider": "gcp",
+  "category": "nosql",
+  "class": 4,
+  "effort": 1.2,
+  "target": "HBase / Cassandra / ScyllaDB",
+  "playbook": "HBase API compatible; export via Dataflow/Parquet."
+ },
+ "google_bigquery_dataset": {
+  "provider": "gcp",
+  "category": "warehouse",
+  "class": 5,
+  "effort": 1.5,
+  "target": "ClickHouse / Trino + Iceberg",
+  "playbook": "Export to Parquet; rewrite SQL dialect, slots and UDFs."
+ },
+ "google_storage_bucket": {
+  "provider": "gcp",
+  "category": "object",
+  "class": 2,
+  "effort": 0.8,
+  "target": "MinIO/Ceph (S3 interop)",
+  "playbook": "rclone with checksums; replicate IAM/lifecycle."
+ },
+ "google_pubsub_topic": {
+  "provider": "gcp",
+  "category": "messaging",
+  "class": 4,
+  "effort": 0.8,
+  "target": "Kafka / NATS",
+  "playbook": "Bridge subscribers; handle ordering keys and dead letters."
+ },
+ "google_cloudfunctions_function": {
+  "provider": "gcp",
+  "category": "serverless",
+  "class": 4,
+  "effort": 1.0,
+  "target": "Knative / containers",
+  "playbook": "Containerise; re-create triggers."
+ },
+ "google_kms_crypto_key": {
+  "provider": "gcp",
+  "category": "keys",
+  "class": 4,
+  "effort": 1.0,
+  "target": "Vault/HSM",
+  "playbook": "Non-exportable: re-encrypt data."
+ }
+}

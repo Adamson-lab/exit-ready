@@ -1,0 +1,6 @@
+{
+ "name": "Northwind Bank \u2014 Payments Platform",
+ "settings": {
+  "egress_waived": false
+ }
+}

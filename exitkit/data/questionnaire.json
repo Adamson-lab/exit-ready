@@ -1,0 +1,40 @@
+{
+ "scale": {"0": "Nothing exists", "1": "Documented only", "2": "Implemented", "3": "Implemented AND tested in last 12 months"},
+ "domains": {
+  "Governance & Contract": [
+   ["GOV-1","Board-approved exit strategy exists for every critical/important cloud service",true],
+   ["GOV-2","Contract grants termination assistance and an adequate transition period",true],
+   ["GOV-3","Contract guarantees data return in open formats with egress fees waived or capped",true],
+   ["GOV-4","Provider failure, insolvency, sanction and regulator-order scenarios are covered",false],
+   ["GOV-5","Exit triggers (SLA breach, price rise, regulatory order) have a named decision owner",false],
+   ["GOV-6","Register of critical services with substitutability assessment is reviewed yearly",false]],
+  "Data & Keys": [
+   ["DAT-1","Full export of every tier-1 dataset has been run end-to-end",true],
+   ["DAT-2","Backups/replicas exist outside the primary provider's control plane",true],
+   ["DAT-3","Encryption keys are held outside the provider (BYOK/HYOK) or re-key is rehearsed",true],
+   ["DAT-4","Data formats are open (Parquet, Avro, SQL dumps) with documented schemas",false],
+   ["DAT-5","Residency / cross-border transfer constraints for target environments are mapped",false],
+   ["DAT-6","Egress volume, duration and cost are modelled from real throughput tests",false]],
+  "Architecture": [
+   ["ARC-1","Tier-1 workloads run on containers/VMs with provider-neutral IaC",true],
+   ["ARC-2","Proprietary services sit behind an internal adapter/abstraction layer",false],
+   ["ARC-3","Identity is federated over OIDC/SAML/SCIM with a provider-independent source of truth",true],
+   ["ARC-4","Observability uses open standards (OpenTelemetry) with independent storage",false],
+   ["ARC-5","CI/CD and artifact registries do not depend on the cloud being exited",false],
+   ["ARC-6","New proprietary services require a documented portability review",false]],
+  "Operations & Resilience": [
+   ["OPS-1","A stressed-exit runbook exists per critical service with named owners",true],
+   ["OPS-2","A warm or cold target environment exists at a second provider/on-prem for tier-1",true],
+   ["OPS-3","Failover to a second provider has been exercised, not just documented",false],
+   ["OPS-4","DNS/TTL and network cutover strategy is prepared",false],
+   ["OPS-5","SaaS/vendor dependencies hosted on the same cloud are mapped (concentration)",false],
+   ["OPS-6","Provider health, financial and geopolitical signals feed the exit triggers",false]],
+  "People & Testing": [
+   ["PPL-1","An exit drill or tabletop ran in the last 12 months with tracked findings",true],
+   ["PPL-2","Skills in target technologies (Kubernetes, Postgres, Kafka, ...) are maintained",false],
+   ["PPL-3","Surge capacity (partners/retainers) is pre-contracted for a stressed exit",false],
+   ["PPL-4","Exit-readiness metrics reach the board/risk committee at least annually",false],
+   ["PPL-5","A regulator notification and engagement plan is prepared",false],
+   ["PPL-6","Lock-in score is tracked over time and drill findings measurably reduce it",false]]
+ }
+}

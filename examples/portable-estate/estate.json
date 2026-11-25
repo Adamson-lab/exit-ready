@@ -1,0 +1,6 @@
+{
+ "name": "Fabrikam Regional Gov Portal",
+ "settings": {
+  "egress_waived": true
+ }
+}
