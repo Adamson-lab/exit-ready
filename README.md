@@ -88,7 +88,7 @@ Fabrikam Regional Gov Portal: 10 resources, aws, $16,750/month
 
 ![portable gantt](docs/img/portable-gantt-stressed.svg)
 
-The generated [`exit-plan.md`](#) contains a Mermaid wave diagram with real dependency edges and a per-resource runbook, e.g.:
+The generated `exit-plan.md` contains a Mermaid wave diagram with real dependency edges and a per-resource runbook, e.g.:
 
 > **aws_dynamodb_table.ledger** (tier1, class 5) → *ScyllaDB / Cassandra / PostgreSQL JSONB* — "Access patterns are the schema: re-model, dual-write via streams, backfill, verify, cut reads then writes."
 > **aws_cognito_user_pool.customers** → *Keycloak / Ory* — "Password hashes cannot be exported: use lazy-migration on first login or forced reset; plan comms."
@@ -97,7 +97,7 @@ The generated [`exit-plan.md`](#) contains a Mermaid wave diagram with real depe
 
 - **Egress is rarely the killer.** ~547 TB costs ≈ $49k to move; the money is in labour, dual-running and re-architecture.
 - **The deadline gets missed by days, not months** — which is exactly why `min_team` and a tested runbook matter.
-- **Class-5 services dominate**: five proprietary services drive most of Northwind's score. That's where to spend de-risking money first.
+- **Proprietary services dominate**: in Northwind, 7 class-5 resources carry 42% of the lock-in impact and class 4–5 together carry 79%. That's where to spend de-risking money first.
 - It is a **model**. Rates, throughput and effort are defaults you should replace with measured values (DAT-6).
 
 Full method, formulas and limits: [`docs/methodology.md`](docs/methodology.md).
